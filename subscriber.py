@@ -6,33 +6,6 @@ from twilio.rest import Client
 import os
 from dotenv import load_dotenv
 
-##load variables from .env
-load_dotenv()
-
-#access twilio variables
-account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-twilio_phone_num = os.environ.get('PHONE_NUM')
-
-#access mosquitto username and password
-mosquitto_username = os.environ.get('MOSQUITTO_USER_NAME')
-mosquitto_password = os.environ.get('MOSQUITTO_PASSWORD')
-
-##connect to technician SMS
-client = Client()
-
-##connect to SQLite
-con = sqlite3.connect("tempHumidity.db")
-cur = con.cursor()
-cur.execute("CREATE TABLE NetworkClosetEnv(time, temp, humidity)")
-##testing table creation
-result = cur.execute("SELECT name FROM sqlite_master")
-result.fetchone()
-
-##buffer values enables adding to database at same timestamp
-temp = None
-humidity = None
-
 ##sends message to technician to inspect reason for high temp or humidity levels
 def send_technician_SMS():
     try:
@@ -91,6 +64,33 @@ def on_message(client, userdata, message):
             ##set values to zero after handling data
             temp = None
             humiidity = None
+
+##load variables from .env
+load_dotenv()
+
+#access twilio variables
+account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+twilio_phone_num = os.environ.get('PHONE_NUM')
+
+#access mosquitto username and password
+mosquitto_username = os.environ.get('MOSQUITTO_USER_NAME')
+mosquitto_password = os.environ.get('MOSQUITTO_PASSWORD')
+
+##connect to technician SMS
+client = Client()
+
+##connect to SQLite
+con = sqlite3.connect("tempHumidity.db")
+cur = con.cursor()
+cur.execute("CREATE TABLE NetworkClosetEnv(time, temp, humidity)")
+##testing table creation
+result = cur.execute("SELECT name FROM sqlite_master")
+result.fetchone()
+
+##buffer values enable the ability to add data to database at same timestamp
+temp = None
+humidity = None
 
 ##connect client to broker and subscribe to temp/humidity data
 broker = "localhost"
