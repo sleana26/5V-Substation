@@ -2,26 +2,36 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 import sqlite3
-from twilio.rest import Client
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
 from dotenv import load_dotenv
 
 ##sends message to technician to inspect reason for high temp or humidity levels
-def send_technician_SMS():
+def email_technician(SCADA_email, SCADA_password, technician_email, subject, body):
+    #compose email
+    message = MIMEMultipart()
+    message['From'] = SCADA_email
+    message['To'] = technician_email
+    message['Subject'] = subject
+
+    message.attach(MIMEText(body, 'environment unstable'))
+
     try:
-        #attempt message
-        message = client.message.create(
-            body = "Network closet environment unstable"
-            from_ = twilio_phone_num
-            to="+1TEC_PHONE_NUM"
-        )
+        # connect to gmail SMTP
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        #enable TLS
+        server.starttls()
+        server.login(SCADA_email, SCADA_password)
 
-        print(f"Message sent succesfully")
+        server.sendmail(SCADA_email, technician_email, message.as_string())
+        print('Notification sent')
 
-    except TwilioRestException as e:
-        print(f"Error: {e.msg}")
-        print(f"HTTP Status: {e.status}")
-        print(f"More Info: {e.code}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+    finally: server.quit()
 
 ##publishes a request for a cooling to turn on
 def cooling_activation():
@@ -68,7 +78,7 @@ def on_message(client, userdata, message):
 ##load variables from .env
 load_dotenv()
 
-#access twilio variables
+#access email variables
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 twilio_phone_num = os.environ.get('PHONE_NUM')
@@ -84,6 +94,7 @@ client = Client()
 con = sqlite3.connect("tempHumidity.db")
 cur = con.cursor()
 cur.execute("CREATE TABLE NetworkClosetEnv(time, temp, humidity)")
+
 ##testing table creation
 result = cur.execute("SELECT name FROM sqlite_master")
 result.fetchone()
