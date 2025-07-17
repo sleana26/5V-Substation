@@ -16,12 +16,12 @@ def email_technician(SCADA_email, SCADA_password, technician_email, subject, bod
     message['To'] = technician_email
     message['Subject'] = subject
 
-    message.attach(MIMEText(body, 'environment unstable'))
+    message.attach(MIMEText(body, 'plain'))
 
     try:
-        # connect to gmail SMTP
+        ##connect to gmail SMTP
         server = smtplib.SMTP('smtp.gmail.com', 587)
-        #enable TLS
+        ##enable TLS
         server.starttls()
         server.login(SCADA_email, SCADA_password)
 
@@ -55,7 +55,7 @@ def manage_data(temp, humidity):
     cur.executemany("INSERT INTO NetworkClosetEnv VALUES(?, ?, ?)", data)
     con.commit()
 
-##defines on_message response. We want to take in the data as an int, check which value it is, temp or humidity, set a value for 
+##defines on_message response. We want to take in the data as an int, check which value it is, temp or humidity, set a value for
 def on_message(client, userdata, message):
     data = int(message.payload.decode("utf-8"))
     if message.topic == 'temp':
