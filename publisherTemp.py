@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 import time
 import thermoHygrometer
 import _sqlite3
+from config import Config
 
 mqttBroker = "mqtt.eclipseprojects.io"
 client = mqtt.Client("temperature")
