@@ -11,4 +11,3 @@ class Config:
         self.mosquitto_password = os.getenv('MOSQUITTO_PASSWORD')
         self.broker_address = os.getenv('BROKER_ADDRESS')
         self.smtp_server = os.getenv('SMTP_SERVER')
-
