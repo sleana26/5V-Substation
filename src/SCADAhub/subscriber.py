@@ -22,6 +22,8 @@ def email_technician(config, subject, body):
     try:
         ##connect to gmail SMTP
         server = smtplib.SMTP(config.smtp_server, 587)
+        
+        ##probably delete this and put login at program start
         ##enable TLS
         server.starttls()
         server.login(config.SCADA_email, config.SCADA_password)
@@ -34,10 +36,6 @@ def email_technician(config, subject, body):
 
     finally: server.quit()
 
-##publishes a request for a cooling to turn on
-def cooling_activation():
-    pass
-
 ## handle environment notifications and print data with time stamp
 def manage_data(temp, humidity):
     timestamp = datetime.datetime.now()
@@ -48,12 +46,12 @@ def manage_data(temp, humidity):
         print("Temp high, sending message to technician")
         ##call technician_SMS function
         email_technician(config, "High Temp", "Network closet temperature high")
-    if humidity > 60:
-        print("Humidity high, sending message to technician")
-        ##call technician_SMS function
-        email_technician(config, "High Humidity", "Network closet humidity high")
+    # if humidity > 60:
+    #     print("Humidity high, sending message to technician")
+    #     ##call technician_SMS function
+    #     email_technician(config, "High Humidity", "Network closet humidity high")
     ##store data in SQLite
-    cur.executemany("INSERT INTO NetworkClosetEnv VALUES(?, ?, ?)", data)
+    cur.executemany("INSERT INTO 5VSubstation VALUES(?, ?, ?)", data)
     con.commit()
 
 ##defines on_message response. We want to take in the data as an int, check which value it is, temp or humidity, set a value for
@@ -79,7 +77,7 @@ def on_message(client, userdata, message):
 ##connect to SQLite
 con = sqlite3.connect("tempHumidity.db")
 cur = con.cursor()
-cur.execute("CREATE TABLE NetworkClosetEnv(time, temp, humidity)")
+cur.execute("CREATE TABLE 5VSubstation(Time, Transformer Temp, Voltage (C1))")
 
 ##testing table creation
 result = cur.execute("SELECT name FROM sqlite_master")
@@ -90,6 +88,7 @@ temp = None
 humidity = None
 
 ##connect client to broker and subscribe to temp/humidity data
+##change this to use websockets
 broker = "localhost"
 client = mqtt.Client("EnvMonitor")
 client.username_pw_set(config.mosquitto_username, config.mosquitto_password)
