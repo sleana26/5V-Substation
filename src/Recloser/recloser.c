@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <gpiod.h>
-#include <recloserConfig.h>
+#include <config.h>
 #include <communication.h>
 #include <faultDetector.h>
+#include <authentication.h>
 
 /**
  * Prompt for recloser configuration
@@ -62,9 +63,18 @@ transmitData() {
 
 int main() {
     //takes care of authentication and configuration
-    recloserStartup()
+    if(login()) {
+        config();
+        logout();
+    }
 
+    //when tech plugs into recloser program will display
+    print("Recloser is active\n");
+    print("Enter 1 to change config\n");
+
+    //runs the main functions of the recloser
     while() {
+        
 
 
     }

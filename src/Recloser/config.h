@@ -10,16 +10,7 @@
  #ifndef CONFIG_H
  #define CONFIG_H
 
-/**
- * Prompts user to change configuration options
- * @returns 1 if configuration was changed
- */
-int changeConfiguration();
 
-/**
- * 
- *
- */
 
 #endif
 
