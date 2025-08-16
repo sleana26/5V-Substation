@@ -1,5 +1,5 @@
 /**
- * @file authetication.h
+ * @file recloserAuth.h
  * @brief local recloser authentication
  * @author Sean Leana
  * @date 8/14/25

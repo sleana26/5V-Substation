@@ -76,7 +76,7 @@ int main() {
     while() {
         
 
-
+        //sc
     }
 
     return 0;

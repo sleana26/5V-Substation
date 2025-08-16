@@ -1,11 +1,14 @@
 /**
+ * @file recloserAuth.c
  * handles local Recloser authentication
  * once logged in the user can access configuration.
  */
 #include <stdlib>
 #include <stdio>
-#include "argon2.h"
 #include <string.h>
+
+#include "argon2.h"
+#include ""
 
 #define MAX_PASS_LEN = 16
 #define HASH_LEN = 32

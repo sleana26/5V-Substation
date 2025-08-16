@@ -1,6 +1,6 @@
 import time
-import gpiod
 
+import gpiod
 
 #set pin configurations
 #reclosers
