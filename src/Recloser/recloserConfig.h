@@ -7,6 +7,8 @@
  * @date August 14 2025
  */
 
+#include <gpiod.h>
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
@@ -15,7 +17,13 @@
  * Prints the existing configuration to the user and prompts them to either
  * change settings or to continue with existing settings
  */
-void config()
+void config();
+
+/**
+ * Edits the configuration file configuration file
+ * @returns 1 if configuration was changed
+ */
+int changeConfiguration(int configNumber);
 
 
 #endif

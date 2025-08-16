@@ -1,47 +1,66 @@
 /**
- * recloserConfig will take care of the configuration of the recloser. The modeled recloser is comprised of the
- * relay and the potentiometer. There will be an initial configuration prior to initial commisioning. There will be an
- * option to change configuration from the SCADA control room
- * 
+ * @file recloserConfig.c
  * @author Sean Leana
- * @file recloserConfig
+ * @brief Allows user to interact with recloser configuration
+ * @date August 14 2025
  */
 
 #include <stdio.h>
-#include <gpiod.h>
-#include <authentication.h>
 
+#include <gpiod.h>
+
+#include "recloserAuth.h"
 
 /**
-* Prompts for recloser configuration and writes it to config file. Normal status, whether the 
-* recloser is normally open or normally closed. Max number of cycles that recloser will run
-* after detecting a fault before remaining open. Open interval is the duration the recloser
-* is open for a single cycle
-*/ 
-initialConfig() {
-    //asks for authentication credentials
+ * Reads the current configuration from config file into a Recloser struct???? idk maybe
+ */
+readConfigurationFromFile() {
 
-    //prompts for settings(eg. normalStatus NO or NC, maxCycles, openInterval)
-    
-    //checks edge cases and sends an error message if entered values are not correct
-
-    //writes to config file
-
-    //lets user know that configuration was successful
 }
 
 /**
-* change recloser configuration. Prompts if user would like to change each setting.
-* (eg "Change normal status? y/n")
-*/
-changeConfig() {
-    //asks for authentication credentials
+ * Edits configuration file
+ * @returns 1 if configuration was changed
+ */
+int changeConfiguration(int configNumber) {
 
-    //prompts for each setting (eg "Change normal status? y/n")
+}
 
-    //checks edge cases and sends an error message if entered values are not correct
+/**
+ * Print the existing configuration
+ */
+static void printConfig() {
+    //prints configuration with numbers next to each config
 
-    //writes to config file
 
-    //lets user know that recloser settings have been updated
+
+}
+
+// returns 1 when config is complete
+void config() {
+    // reads configuration from file
+    //TODO
+
+    // prints config 
+    //or if they want to continue with existing config
+    char input = '\0';
+    //asks user to enter number of config to change
+    while(input != 1) {
+        printConfig();
+        printf("Enter configuration number to change associated configuration 
+                or enter 1 to exit: ");
+        char input = getchar();
+        
+        if(input == '1') {
+            return;
+        } else if(input > 0 && input <= 10) {
+            if(changeConfiguration(_)) {
+                printf("\n");
+                printf("Configuration changed successfully.\n");
+                printf("\n");                    
+            }
+        } else {
+            printf("Invalid input\n");
+        }
+    }
 }
