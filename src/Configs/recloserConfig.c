@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-#include <gpiod.h>
+//#include <gpiod.h>
 
 #include "recloserAuth.h"
 
@@ -15,7 +15,7 @@
  * Reads the current configuration from config file into a Recloser struct???? idk maybe
  */
 readConfigurationFromFile() {
-
+    //fscanf(&)
 }
 
 /**
@@ -23,7 +23,7 @@ readConfigurationFromFile() {
  * @returns 1 if configuration was changed
  */
 int changeConfiguration(int configNumber) {
-
+    //if(configNumber == )
 }
 
 /**
@@ -64,3 +64,7 @@ void config() {
         }
     }
 }
+
+/**
+ * Store configuration in a struct for quick access
+ */

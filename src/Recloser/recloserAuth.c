@@ -3,12 +3,16 @@
  * handles local Recloser authentication
  * once logged in the user can access configuration.
  */
-#include <stdlib>
-#include <stdio>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
+//hash library
 #include "argon2.h"
+//salt library
 #include ""
+
+#include "../Common/files.c"
 
 #define MAX_PASS_LEN = 16
 #define HASH_LEN = 32
@@ -49,36 +53,27 @@ void logOut() {
 }
 
 /**
- * Opens password file in read or write mode
- * @param mode 'r' for read, 'w' for write
- */
-static FILE *openPasswordFile(char mode) {
-    FILE *passfile;
-    passfile = fopen("env/password.txt", mode);
-    //check if file was found
-    if(!passfile) {
-        fprintf(stderr, "Error: Can't access passwords.\n");
-        exit(1);
-    }
-    return passfile;
-}
-
-/**
  * Checks if a password exists or if one needs to be created
- * @returns 1 if password exists
+ * @returns 1 if password exists, 0 if no password
  */
-static int doesPasswordExists() {
+static int doesPasswordExist() {
     //open password file to see if admin account already has a password set
-    FILE *passfile = openPasswordFile('r');
-    char user[] = "admin";
-    char delimiter = ":"
-    strncat(user, &delimiter, 1);
-    char buffer[BUFFER_SIZE] = { };
-    fgets(buffer, BUFFER_SIZE, passfile);
-
-    fclose(passfile);
-
-    return strcmp(buffer, user);
+    //Maybe setjmp longjmp to catch errors, or handle an error from openFile someother way
+    FILE *passfile = openFile('../env/passwords.txt', 'r');
+    //change this to scan user name
+    //functionality will check to see if there is only one colon in password.txt line
+    // meaning the user has no password
+    int colonCount = 0;
+    char ch = fgetc(passfile);
+    while(ch != EOF && ch != '\0') {
+        ch = fgetc(passfile);
+        colonCount++;
+    }
+    if(colonCount = 1) {
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
 /**
@@ -119,7 +114,7 @@ static int loginAttempt() {
  */
 static int setPass() {
     char passSet[MAX_PASS_LEN + 1] = { };
-    printf(stdout, "Set a password between 8 and 16 characters long for admin: ");
+    printf(stdout, "Set a password between 8 and 16 characters long for 'admin': ");
     int j = 0;
     ch = getchar();
     int passwordAccepted = 0;

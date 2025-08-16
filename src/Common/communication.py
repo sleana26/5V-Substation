@@ -1,6 +1,10 @@
 import time
 
-sendEmail()
+import emailConfig
+
+sendEmail() {
+
+}
 
 sendSMS()
 
