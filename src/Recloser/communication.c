@@ -15,3 +15,5 @@ handleInput()
 sendTestMessageOnStart()
 
 disconnectFromBroker()
+
+logToLocalFile()

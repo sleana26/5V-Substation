@@ -2,20 +2,20 @@ import time
 
 import emailConfig
 
-sendEmail() {
+def sendEmail():
 
-}
+def sendSMS():
 
-sendSMS()
+def publish():
 
-publish()
+def subcribe():
 
-subcribe()
+def connectToBroker():
 
-connectToBroker()
+def handleInput():
 
-handleInput()
+def sendTestMessageOnStart():
 
-sendTestMessageOnStart()
+def disconnectFromBroker():
 
-disconnectFromBroker()
+def logLocally():

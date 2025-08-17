@@ -1,9 +1,47 @@
 #include <stdio.h>
 #include <gpiod.h>
-#include <config.h>
-#include <communication.h>
-#include <faultDetector.h>
-#include <authentication.h>
+
+#include "communication.h"
+#include "faultDetector.h"
+#include "recloserAuth.h"
+
+/**
+ * Structure holding the Recloser configuration 
+ */
+struct recloserConfig {
+    /**
+     * Reclose attempts
+     */
+    int recloseAttempts;
+
+    /**
+     * The duration the recloser will open for on first cycle (ms)
+     */
+    int recloseOpenInterval1;
+
+    /**
+     * The duration the recloser will open for on first cycle (ms)
+     */
+    int recloseOpenInterval2;
+
+    /**
+     * The duration the recloser will open for on first cycle (ms)
+     */
+    int recloseOpenInterval3;
+
+    /**
+     * The duration the recloser will open for on first cycle (ms)
+     */
+    int recloseOpenInterval4;
+
+    /** the topics that the recloser subscribes to */
+    char *subcriptions[];
+
+
+
+
+
+}
 
 /**
  * Prompt for recloser configuration
@@ -52,14 +90,6 @@ initiateCycle() {
     //if max cycles are complete. Leave recloser open and change recloser status
 }
 
-/**
- * transmits data via MQTT using websockets. Sends information such as voltage, recloser status, to broker
- */
-transmitData() {
-
-}
-
-
 
 int main() {
     //takes care of authentication and configuration
@@ -70,6 +100,8 @@ int main() {
 
     //when tech plugs into recloser program will display
     print("Recloser is active\n");
+    //prompt for login
+    
     print("Enter 1 to change config\n");
 
     //runs the main functions of the recloser
