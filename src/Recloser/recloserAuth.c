@@ -1,7 +1,8 @@
 /**
  * @file recloserAuth.c
- * handles local Recloser authentication
- * once logged in the user can access configuration.
+ * @brief handles local Recloser authentication once logged in the user can access configuration.
+ * @author Sean Leana
+ * @date 8/14/25
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,8 +10,8 @@
 
 //hash library
 #include "argon2.h"
-//salt library
-#include ""
+//openssl
+#include <openssl/rand.h>
 
 #include "../Common/files.c"
 
@@ -19,10 +20,80 @@
 #define SALT_LEN = 16
 #define BUFFER_SIZE = 100
 
+uint8_t salt[SALT_LEN];
+uint8_t hash[HASH_LEN];
+
+
+/**
+ * Generates random salt for hash, prints error if there is an error
+ */
+static uint8_t *generateSalt(uint8_t *salt, int saltLength) {
+
+    memset(salt, 0x00, SALT_LEN);
+
+    if(RAND_bytes(salt, saltLength)) {
+        return saltPtr;
+    } else {
+        printf(stderr, "Error generating random salt.");
+        exit(EXIT_FAILURE);
+    }
+}
+
+/**
+* hashes the password and stores it
+*/
+static uint8_t *hashPass(char *enteredPass, uint8_t *saltPtr, uint8_t *hash) {
+    //duplicates password entered by user
+    uint8_t *enteredPassDup = (uint8_t *)strdup(enteredPass);
+
+    //gets length of paaword
+    uint32_t enteredPassLen = strlen((char *)enteredPassDup);
+
+    //two passes
+    uint32_t t_cost = 2;
+    uint32_t m_cost = (1 << 16);
+
+    //number of threads
+    uint32_t parallelism = 1;
+
+    argon2i_hash_raw(t_cost, m_cost, parallelism, enteredPassDup, enteredPassLen, saltPtr, SALT_LEN, hash, HASH_LEN);
+
+    return hash;
+}
+
+
+
+/**
+* compares hash from login attempt and stored hash. returns 1 if they are equal
+* @
+*/
+static int compareHash(uint8_t hashedPassAttempt) {
+    FILE *passfile = openPasswordFile('r');
+
+
+
+
+    fclose(passfile);
+}
+
+/**
+* Stores the password and returns 1 if successful
+* @
+*/
+static int storeHash(uint8_t) {
+    FILE *passfile = openPasswordFile('w');
+
+
+
+
+    fclose(passfile);
+}
+
 /**
  * When zero, user is not logged in. When one, user is logged in
  */
 int loggedIn = 0;
+
 
 /**
  * Checks if a password has been set for the admin account, if not the user will be prompted to set a password.
@@ -95,7 +166,7 @@ static int loginAttempt() {
             k++;
         }
         attemptCount++;
-        uint_t hashedPassAttempt = hashPass(passAttempt);
+        uinthashPtr_t hashedPassAttempt = hashPass(passAttempt);
         passwordMatched = compareHash(hashedPassAttempt);
         if(passwordMatched) {
             printf("Welcome\n");
@@ -124,7 +195,8 @@ static int setPass() {
             ch = getchar();
             j++;
         }
-        if(j < 8 || j > 16) {
+        passSet[j + 1] = '\0';
+        if(j < 8 || j > 17) {
             printf(stdout, "Password must be between 8 and 16 characters long. Try again: ");
             ch = getchar();
             j = 0;
@@ -138,48 +210,3 @@ static int setPass() {
     }
 }
 
-/**
-* hashes the password and stores it
-*/
-static uint_t hashPass(char * enteredPass) {
-    uint8_t hash[HASH_LEN];
-
-    uint8_t salt = generateSalt();
-
-    //GENERATE A SALT
-
-    memset(salt, )
-
-
-
-}
-
-static uint8_t *generateSalt() {
-
-}
-
-/**
-* compares hash from login attempt and stored hash. returns 1 if they are equal
-* @
-*/
-static int compareHash(uint8_t hashedPassAttempt) {
-    FILE *passfile = openPasswordFile('r');
-
-
-
-
-    fclose(passfile);
-}
-
-/**
-* Stores the password and returns 1 if successful
-* @
-*/
-static int storeHash(uint8_t) {
-    FILE *passfile = openPasswordFile('w');
-
-
-
-
-    fclose(passfile);
-}
