@@ -18,3 +18,7 @@ FILE *openFile(char *path, char mode) {
     }
     return fileptr;
 }
+
+char *scanLine(FILE *fileptr, char *line) {
+    fgets(line, size(line), fileptr);
+}

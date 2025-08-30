@@ -93,6 +93,7 @@ initiateCycle() {
 
 int main() {
     //takes care of authentication and configuration
+    //we will use a default username of 'admin' for system setup
     if(login()) {
         config();
         logout();

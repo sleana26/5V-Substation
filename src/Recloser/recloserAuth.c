@@ -7,32 +7,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <openssl/rand.h>
 
 //hash library
 #include "argon2.h"
-//openssl
-#include <openssl/rand.h>
-
-#include "../Common/files.c"
+#include "../Common/files.h"
 
 #define MAX_PASS_LEN = 16
 #define HASH_LEN = 32
 #define SALT_LEN = 16
 #define BUFFER_SIZE = 100
 
-uint8_t salt[SALT_LEN];
-uint8_t hash[HASH_LEN];
-
-
 /**
  * Generates random salt for hash, prints error if there is an error
  */
-static uint8_t *generateSalt(uint8_t *salt, int saltLength) {
+static uint8_t *generateSalt(uint8_t *salt) {
 
     memset(salt, 0x00, SALT_LEN);
 
     if(RAND_bytes(salt, saltLength)) {
-        return saltPtr;
+        return salt;
     } else {
         printf(stderr, "Error generating random salt.");
         exit(EXIT_FAILURE);
@@ -40,9 +34,10 @@ static uint8_t *generateSalt(uint8_t *salt, int saltLength) {
 }
 
 /**
-* hashes the password and stores it
+* hashes the password
 */
-static uint8_t *hashPass(char *enteredPass, uint8_t *saltPtr, uint8_t *hash) {
+static uint8_t *hashPass(char *enteredPass, uint8_t *salt, uint8_t *hash) {
+
     //duplicates password entered by user
     uint8_t *enteredPassDup = (uint8_t *)strdup(enteredPass);
 
@@ -56,43 +51,51 @@ static uint8_t *hashPass(char *enteredPass, uint8_t *saltPtr, uint8_t *hash) {
     //number of threads
     uint32_t parallelism = 1;
 
+    //hash
     argon2i_hash_raw(t_cost, m_cost, parallelism, enteredPassDup, enteredPassLen, saltPtr, SALT_LEN, hash, HASH_LEN);
 
     return hash;
 }
 
-
-
 /**
 * compares hash from login attempt and stored hash. returns 1 if they are equal
 * @
 */
-static int compareHash(uint8_t hashedPassAttempt) {
+static int compareHash(char *passAttempt, char *user) {
     FILE *passfile = openPasswordFile('r');
+    // read line from password file
+    char *line[100];
+    scanLine(passfile, line);
+    //find user in pass file
+    int i = 0;
+    char *buff[100];
+    while(line[i] != ':') {
 
+    }
 
+    // read salt from password file
 
+    // read hash from password file
+
+    // hash the attempted password 
+
+    // compare attempted password hash to the stored hash
+    
 
     fclose(passfile);
 }
 
 /**
-* Stores the password and returns 1 if successful
-* @
+* Stores the authentication info in password file and returns 1 if successful
 */
-static int storeHash(uint8_t) {
+static int storeHash(uint8_t *salt, uint8_t *hash) {
+    //open password file in write mode
     FILE *passfile = openPasswordFile('w');
 
-
-
+    //write hash to password file
 
     fclose(passfile);
 }
-
-/**
- * When zero, user is not logged in. When one, user is logged in
- */
-int loggedIn = 0;
 
 
 /**
@@ -101,6 +104,8 @@ int loggedIn = 0;
  * @returns 1 if user was successfully signed in
  */
 int login() {
+    // I think I need to check if user and pass file is empty and then I can go through a setup process where
+    // user sets pass for admin "first startup, set password for admin: ", otherwise user is prompted for username "enter username"
     //checks if user "admin" already has a password
     if(doesPasswordExists()) {
         //prompts user and checks if hash matches
@@ -151,8 +156,9 @@ static int doesPasswordExist() {
  *
  * 
  */
-static int loginAttempt() {
-    printf(stdout, "Enter admin password: ");
+static int loginAttempt(char *username) {
+    printf(stdout, "Enter username: ");
+    printf(stdout, "Enter password: ");
     //stores entered pass
     char passAttempt[BUFFER_SIZE] = {};
     int k = 0;
@@ -166,18 +172,21 @@ static int loginAttempt() {
             k++;
         }
         attemptCount++;
-        uinthashPtr_t hashedPassAttempt = hashPass(passAttempt);
-        passwordMatched = compareHash(hashedPassAttempt);
-        if(passwordMatched) {
-            printf("Welcome\n");
+        if(comparePass(passAttempt, user)) {
+            printf("Welcome.\n");
             return 1;
         }
-        if(attemptCount == 3) {
-            printf("Three attempts failed, please wait 30s before trying again\n");
+        else if(attemptCount == 3) {
+            printf("Three attempts failed, please wait 30s before trying again.\n");
             time.sleep(10);
         }
     }
 }
+
+       // uint8_t salt[SALT_LEN];
+       // for another function
+       // generateSalt(salt);
+       // hashedPassAttempt = hashPass(passAttempt, salt, hash);
 
 /**
  * User sets the password
@@ -196,17 +205,19 @@ static int setPass() {
             j++;
         }
         passSet[j + 1] = '\0';
-        if(j < 8 || j > 17) {
+        if(j < 9 || j > 17) {
             printf(stdout, "Password must be between 8 and 16 characters long. Try again: ");
             ch = getchar();
             j = 0;
         } else {
             passwordAccepted = 1;
-            hashSet = hashpass(passSet);
-            if(storeHash(hashSet)) {
+            uint8_t salt[SALT_LEN];
+            salt = generateSalt(salt);
+            uint8_t hash[HASH_LEN];
+            hash = hashpass(passSet, salt, hash);
+            if(storeAuth(salt, hash)) {
                 return 1;
             }
         }
     }
 }
-
