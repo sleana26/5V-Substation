@@ -19,6 +19,26 @@ FILE *openFile(char *path, char mode) {
     return fileptr;
 }
 
-char *scanLine(FILE *fileptr, char *line) {
-    fgets(line, size(line), fileptr);
+/**
+ * Scans line from file stream passed in and returns the char pointer
+ */
+char *scanLine(FILE *fileptr) {
+    if(fileptr == NULL) {
+        return NULL;
+    }
+    int capacity = 5;
+    int len = 0;
+    char *line = (char*) malloc(capacity * sizeof(char));
+    while((ch = fgetc(fileptr)) != '\n' && ch != EOF) {
+        if(len >= capacity) {
+            capacity *= 2;
+            char *newline = (char *) malloc(capacity * sizeof(char));
+            strcpy(newline, line);
+            free(line);
+            line = newLine;
+        }
+        line[len++] = ch;
+    }
+    line[len] = '\0';
+    return line;
 }

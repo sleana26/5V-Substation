@@ -8,12 +8,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <openssl/rand.h>
+#include <inttypes.h>
 
 //hash library
 #include "argon2.h"
 #include "../Common/files.h"
 
 #define MAX_PASS_LEN = 16
+#define MAX_USER_LEN = 16
 #define HASH_LEN = 32
 #define SALT_LEN = 16
 #define BUFFER_SIZE = 100
@@ -58,45 +60,77 @@ static uint8_t *hashPass(char *enteredPass, uint8_t *salt, uint8_t *hash) {
 }
 
 /**
-* compares hash from login attempt and stored hash. returns 1 if they are equal
+* compares username from login to file. if theres a match for username then password gets checkdreturns 1 if they are equal
 * @
 */
-static int compareHash(char *passAttempt, char *user) {
-    FILE *passfile = openPasswordFile('r');
-    // read line from password file
-    char *line[100];
-    scanLine(passfile, line);
-    //find user in pass file
-    int i = 0;
-    char *buff[100];
-    while(line[i] != ':') {
-
-    }
-
-    // read salt from password file
-
-    // read hash from password file
-
-    // hash the attempted password 
-
-    // compare attempted password hash to the stored hash
+static bool compareCredentials(char *passAttempt, char *user) {
+    FILE *passfile = openPasswordFile('../../files/passwords.txt', 'r');
     
+    //find user in pass file
+    char *line;
+    char buff[BUFFER_SIZE];
+    int index = 0;
+    // read users from password file until EOF or user match is found
+    while(line = scanLine(passfile)) {
+        if(sscanf(line, "%99[^:]%n", buff, &index) == 1) {
+            if(strcmp(buff, user) == 0) {
+                offset++;
+                break;
+            }
+        }
+    }
+    // if line returned is NULL the user was not found
+    if(line == NULL) {
+        return false;
+    }
+    //get salt from password file
+    uint_t salt[SALT_LEN];
+    int i = 0;
+    while(line[index] != ':') {
+        if(line[index] == '\n' || line[index] == EOF || i > SALT_LEN) {
+            printf("password file error1");
+        }
+        salt[i] = (uint_t *)line[index];
+        index++;
+        i++;
+    }
+    index++;
 
-    fclose(passfile);
+    //hash the password entered by user
+    size_t hashAttempt[HASH_LEN];
+    hashPass(passAttempt, salt, hashAttempt);
+    int j = 0;
+
+    //compare hash from entered password to stored hash
+    while(line[j] != '\0' && line[j] != EOF ) {
+        if(hashAttempt[j] != (uint_t *)line[index]) {
+            printf("hashes dont match\n");
+            fclose(passfile);
+            return false;
+        }
+        index++;
+        j++;
+    }
+    if(j == HASH_LEN - 1) {
+        fclose(passfile);
+        return true;
+    } else {
+        fclose(passfile);
+        return false;
+    }
 }
 
 /**
 * Stores the authentication info in password file and returns 1 if successful
 */
-static int storeHash(uint8_t *salt, uint8_t *hash) {
+static int storeAuth(char * username, uint8_t *salt, uint8_t *hash) {
     //open password file in write mode
     FILE *passfile = openPasswordFile('w');
 
-    //write hash to password file
+    fprintf(passfile, "%u", )
 
     fclose(passfile);
 }
-
 
 /**
  * Checks if a password has been set for the admin account, if not the user will be prompted to set a password.
@@ -104,19 +138,25 @@ static int storeHash(uint8_t *salt, uint8_t *hash) {
  * @returns 1 if user was successfully signed in
  */
 int login() {
-    // I think I need to check if user and pass file is empty and then I can go through a setup process where
-    // user sets pass for admin "first startup, set password for admin: ", otherwise user is prompted for username "enter username"
-    //checks if user "admin" already has a password
-    if(doesPasswordExists()) {
+    // I think I need to check if user and pass file exists, if not creates one, and then I can go through a setup process where
+    // user sets pass for admin if the file didnt exist "first startup, set password for admin: ", otherwise user is prompted for
+    // username "enter username(default is admin)" and then password "enter pass":
+    if(passFileExists()) {
         //prompts user and checks if hash matches
         if(loginAttempt()) {
             loggedIn = 1;
             return 1;
+        } else {
+            printf("Error logging in\n");
+            return 0;
         }
     } else {
-        if(setPass()) {
+        if(passwordSet()) {
             loggedIn = 1;
             return 1;
+        } else {
+            printf("Error setting password\n");
+            return 0;
         }
     }
 }
@@ -129,26 +169,17 @@ void logOut() {
 }
 
 /**
- * Checks if a password exists or if one needs to be created
+ * Checks if a password exists
  * @returns 1 if password exists, 0 if no password
  */
-static int doesPasswordExist() {
-    //open password file to see if admin account already has a password set
-    //Maybe setjmp longjmp to catch errors, or handle an error from openFile someother way
-    FILE *passfile = openFile('../env/passwords.txt', 'r');
-    //change this to scan user name
-    //functionality will check to see if there is only one colon in password.txt line
-    // meaning the user has no password
-    int colonCount = 0;
-    char ch = fgetc(passfile);
-    while(ch != EOF && ch != '\0') {
-        ch = fgetc(passfile);
-        colonCount++;
-    }
-    if(colonCount = 1) {
-        return 0;
+static bool passFileExists() {
+     //open password file to see if admin account already has a password set
+     //Maybe setjmp longjmp to catch errors, or handle an error from openFile someother way
+    FILE *passfile = fopen('../../files/passwords.txt');
+    if(!passfile) {
+        return false;
     } else {
-        return 1;
+         return true;
     }
 }
 
@@ -157,19 +188,29 @@ static int doesPasswordExist() {
  * 
  */
 static int loginAttempt(char *username) {
-    printf(stdout, "Enter username: ");
-    printf(stdout, "Enter password: ");
+    int i = 0;
+    char username[MAX_USER_LEN] = {};
+    printf(stdout, "Enter username(default: 'admin'): ");
+    while((ch = getchar()) != NULL) && ch != EOF) {
+        if((ch > 0 && ch <  33) || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || (ch > 122)) {
+            printf("No special characters allowed, please try again: ");
+        } else if (i >= MAX_USER_LEN){
+            
+        }
+        else {
+            username[i++] = ch;
+        }
+        
+    }
     //stores entered pass
     char passAttempt[BUFFER_SIZE] = {};
-    int k = 0;
     int passwordMatched = 0;
     int attemptCount = 0;
-    ch = getchar();
+    printf(stdout, "Password: ");
+
     while(!passwordMatched) {
-        while(ch != EOF && ch != '\0') {
-            passAttempt[k] = ch;
-            ch = getchar();
-            k++;
+        while((ch = getchar()) != NULL) && ch != EOF) {
+            username[i++] = ch;
         }
         attemptCount++;
         if(comparePass(passAttempt, user)) {
@@ -192,8 +233,10 @@ static int loginAttempt(char *username) {
  * User sets the password
  * @returns 1 if password is set
  */
-static int setPass() {
-    char passSet[MAX_PASS_LEN + 1] = { };
+static bool passwordSet() {
+    char username[MAX_USER_LEN + 1] = {};
+    char passSet[MAX_PASS_LEN + 1] = {};
+    printf(stdout, "Initial startup.\n");
     printf(stdout, "Set a password between 8 and 16 characters long for 'admin': ");
     int j = 0;
     ch = getchar();
@@ -215,8 +258,8 @@ static int setPass() {
             salt = generateSalt(salt);
             uint8_t hash[HASH_LEN];
             hash = hashpass(passSet, salt, hash);
-            if(storeAuth(salt, hash)) {
-                return 1;
+            if(storeAuth(username, salt, hash)) {
+                return true;
             }
         }
     }
