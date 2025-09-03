@@ -24,9 +24,7 @@
  * Generates random salt for hash, prints error if there is an error
  */
 static uint8_t *generateSalt(uint8_t *salt) {
-
     memset(salt, 0x00, SALT_LEN);
-
     if(RAND_bytes(salt, saltLength)) {
         return salt;
     } else {
@@ -123,12 +121,20 @@ static bool compareCredentials(char *passAttempt, char *user) {
 /**
 * Stores the authentication info in password file and returns 1 if successful
 */
-static int storeAuth(char * username, uint8_t *salt, uint8_t *hash) {
+static void storeAuth(char * username, uint8_t *salt, uint8_t *hash) {
     //open password file in write mode
     FILE *passfile = openPasswordFile('w');
 
-    fprintf(passfile, "%u", )
-
+    fprintf(passfile, "%s", username);
+    fprintf(passfile, ":");
+    for(int i = 0; i < SALT_LEN; i++) {
+        fprintf(passfile, "%u", *salt[i]);
+    }
+    fprintf(passfile, ":");
+    for(int j = 0; j < HASH_LEN; j++) {
+        fprintf(passfile, "%u", *hash[j];
+    }
+    fprintf(passfile, "\n");
     fclose(passfile);
 }
 
@@ -187,47 +193,47 @@ static bool passFileExists() {
  *
  * 
  */
-static int loginAttempt(char *username) {
+static int loginAttempt() {
     int i = 0;
-    char username[MAX_USER_LEN] = {};
+    char username[MAX_USER_LEN] = { };
     printf(stdout, "Enter username(default: 'admin'): ");
     while((ch = getchar()) != NULL) && ch != EOF) {
         if((ch > 0 && ch <  33) || (ch > 57 && ch < 65) || (ch > 90 && ch < 97) || (ch > 122)) {
             printf("No special characters allowed, please try again: ");
-        } else if (i >= MAX_USER_LEN){
-            
-        }
-        else {
+        } else if (i >= MAX_USER_LEN) {
+            printf("Username max length is 16 characters");
+        } else {
             username[i++] = ch;
         }
-        
     }
+    username[i] = '\0';
     //stores entered pass
     char passAttempt[BUFFER_SIZE] = {};
     int passwordMatched = 0;
     int attemptCount = 0;
-    printf(stdout, "Password: ");
+    printf("Password: ");
 
     while(!passwordMatched) {
         while((ch = getchar()) != NULL) && ch != EOF) {
-            username[i++] = ch;
+            passAttempt[j++] = ch;
         }
-        attemptCount++;
-        if(comparePass(passAttempt, user)) {
+        passAttempt[j] = '\0';
+        if(compareCredentials(passAttempt, username)) {
             printf("Welcome.\n");
             return 1;
-        }
-        else if(attemptCount == 3) {
-            printf("Three attempts failed, please wait 30s before trying again.\n");
-            time.sleep(10);
+        } else {
+            if(attemptCount >= 3) {
+                printf("Attempt failed, please wait 10s before trying again.\n");
+                time.sleep(10);
+                printf("Password: ");
+                attemptCount++;
+            } else {
+                printf("Password: ");
+                attemptCount++;
+            }
         }
     }
 }
-
-       // uint8_t salt[SALT_LEN];
-       // for another function
-       // generateSalt(salt);
-       // hashedPassAttempt = hashPass(passAttempt, salt, hash);
 
 /**
  * User sets the password
@@ -236,8 +242,8 @@ static int loginAttempt(char *username) {
 static bool passwordSet() {
     char username[MAX_USER_LEN + 1] = {};
     char passSet[MAX_PASS_LEN + 1] = {};
-    printf(stdout, "Initial startup.\n");
-    printf(stdout, "Set a password between 8 and 16 characters long for 'admin': ");
+    printf("Initial startup.\n");
+    printf("Set a password between 8 and 16 characters long for 'admin': ");
     int j = 0;
     ch = getchar();
     int passwordAccepted = 0;
@@ -258,9 +264,8 @@ static bool passwordSet() {
             salt = generateSalt(salt);
             uint8_t hash[HASH_LEN];
             hash = hashpass(passSet, salt, hash);
-            if(storeAuth(username, salt, hash)) {
-                return true;
-            }
+            storeAuth(username, salt, hash);
+            return true;
         }
     }
 }
