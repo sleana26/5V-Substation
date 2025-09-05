@@ -125,8 +125,8 @@ static void storeAuth(char * username, uint8_t *salt, uint8_t *hash) {
     //open password file in write mode
     FILE *passfile = openPasswordFile('w');
 
-    fprintf(passfile, "%s", username);
-    fprintf(passfile, ":");
+    fprintf(passfile, "%s:", username);
+
     for(int i = 0; i < SALT_LEN; i++) {
         fprintf(passfile, "%u", *salt[i]);
     }
@@ -135,6 +135,7 @@ static void storeAuth(char * username, uint8_t *salt, uint8_t *hash) {
         fprintf(passfile, "%u", *hash[j];
     }
     fprintf(passfile, "\n");
+    
     fclose(passfile);
 }
 
@@ -209,11 +210,10 @@ static int loginAttempt() {
     username[i] = '\0';
     //stores entered pass
     char passAttempt[BUFFER_SIZE] = {};
-    int passwordMatched = 0;
     int attemptCount = 0;
     printf("Password: ");
 
-    while(!passwordMatched) {
+    while(true) {
         while((ch = getchar()) != NULL) && ch != EOF) {
             passAttempt[j++] = ch;
         }
@@ -240,26 +240,19 @@ static int loginAttempt() {
  * @returns 1 if password is set
  */
 static bool passwordSet() {
-    char username[MAX_USER_LEN + 1] = {};
     char passSet[MAX_PASS_LEN + 1] = {};
     printf("Initial startup.\n");
     printf("Set a password between 8 and 16 characters long for 'admin': ");
     int j = 0;
-    ch = getchar();
-    int passwordAccepted = 0;
-    while(!passwordAccepted) {
-        while(ch != EOF && ch != '\0') {
-            passSet[j] = ch;
-            ch = getchar();
-            j++;
+    while(true) {
+        while(((ch = getchar()) != EOF) && ch != '\0') {
+            passSet[j++] = ch;
         }
-        passSet[j + 1] = '\0';
+        passSet[j] = '\0';
         if(j < 9 || j > 17) {
             printf(stdout, "Password must be between 8 and 16 characters long. Try again: ");
-            ch = getchar();
             j = 0;
         } else {
-            passwordAccepted = 1;
             uint8_t salt[SALT_LEN];
             salt = generateSalt(salt);
             uint8_t hash[HASH_LEN];
