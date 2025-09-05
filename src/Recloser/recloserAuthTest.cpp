@@ -9,10 +9,29 @@ extern "C" {
 #define SALT_LEN = 16
 #define BUFFER_SIZE = 100
 
+TEST(addTest, twoPositive) {
+    EXPECT_EQ(add(1, 2), 3);
+}
+
+
 TEST(generateSaltTest, handleSaltArray) {
     uint8_t salt[SALT_LEN];
-    uint8_t *rv = generateSalt(salt);
+    enerateSalt(salt);
     for(int i = 0; i < SALT_LEN; i++) {
-        ASSERT_EQ(salt[i], rv[i]);
+        EXPECT_NE(salt[i], 0) << "INDEX: " << i << std::cout;
+    }
+}
+
+TEST(hashPass, returnCorrectSize) {
+    char enteredPass[] = {A,B,C};
+    uint8_t salt[SALT_LEN] = {};
+    salt = generateSalt(salt);
+    uint8_t hash[HASH_LEN] = {};
+    for(int i = 0; i < SALT_LEN; i++) {
+        EXPECT_NE(salt[i], 0) << "INDEX: " << i << std::cout;
+    }
+    uint8_t *rv = hashPass(enteredPass, salt, hash);
+    for(int i = 0; i < HASH_LEN; i++) {
+        EXPECT_NE(hash[i], 0) << "INDEX: " << i << "Hash Value: " << hash[i] std::cout;
     }
 }
