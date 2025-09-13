@@ -37,10 +37,6 @@ struct recloserConfig {
     /** the topics that the recloser subscribes to */
     char *subcriptions[];
 
-
-
-
-
 }
 
 /**
@@ -49,12 +45,10 @@ struct recloserConfig {
  */ 
 recloserStartup() {
     //authentication
-
-    //check for existing configuration and print it
-
-    //make sure user wants to proceed with existing configuration
-
-    //NEED TO MAKE SURE NO RECLOSER IS SET UP AND READY BEFORE
+    login();
+    
+    //check for existing configuration file and print it
+    config(struct RecloserConfig);
 }
 
 /** 
@@ -94,10 +88,8 @@ initiateCycle() {
 int main() {
     //takes care of authentication and configuration
     //we will use a default username of 'admin' for system setup
-    if(login()) {
-        config();
-        logout();
-    }
+    recloserStartup();
+
 
     //when tech plugs into recloser program will display
     print("Recloser is active\n");

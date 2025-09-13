@@ -13,6 +13,7 @@
 //hash library
 #include "argon2.h"
 #include "../Common/files.h"
+#include "../../env/passwords.txt"
 
 #define MAX_PASS_LEN = 16
 #define MAX_USER_LEN = 16
@@ -62,7 +63,7 @@ static uint8_t *hashPass(char *enteredPass, uint8_t *salt, uint8_t *hash) {
 * @
 */
 static bool compareCredentials(char *passAttempt, char *user) {
-    FILE *passfile = openPasswordFile('../../files/passwords.txt', 'r');
+    FILE *passfile = openPasswordFile("../../", 'r');
     
     //find user in pass file
     char *line;
@@ -149,22 +150,10 @@ int login() {
     // user sets pass for admin if the file didnt exist "first startup, set password for admin: ", otherwise user is prompted for
     // username "enter username(default is admin)" and then password "enter pass":
     if(passFileExists()) {
-        //prompts user and checks if hash matches
-        if(loginAttempt()) {
-            loggedIn = 1;
-            return 1;
-        } else {
-            printf("Error logging in\n");
-            return 0;
-        }
+        //if user is authenticated return 1
+        loginAttempt();
     } else {
-        if(passwordSet()) {
-            loggedIn = 1;
-            return 1;
-        } else {
-            printf("Error setting password\n");
-            return 0;
-        }
+        passwordSet();
     }
 }
 
@@ -237,7 +226,7 @@ static int loginAttempt() {
 
 /**
  * User sets the password
- * @returns 1 if password is set
+ * @returns true if password is set
  */
 static bool passwordSet() {
     char passSet[MAX_PASS_LEN + 1] = {};

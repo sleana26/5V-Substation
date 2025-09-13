@@ -6,6 +6,7 @@
 
 /**
  * Opens password file in read or write mode
+ * @param path path of file
  * @param mode 'r' for read, 'w' for write
  */
 FILE *openFile(char *path, char mode) {
@@ -28,6 +29,7 @@ char *scanLine(FILE *fileptr) {
     }
     int capacity = 5;
     int len = 0;
+    char ch;
     char *line = (char*) malloc(capacity * sizeof(char));
     while((ch = fgetc(fileptr)) != '\n' && ch != EOF) {
         if(len >= capacity) {
@@ -35,7 +37,7 @@ char *scanLine(FILE *fileptr) {
             char *newline = (char *) malloc(capacity * sizeof(char));
             strcpy(newline, line);
             free(line);
-            line = newLine;
+            line = newline;
         }
         line[len++] = ch;
     }
