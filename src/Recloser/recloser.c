@@ -3,41 +3,8 @@
 
 #include "communication.h"
 #include "faultDetector.h"
+#include "recloserConfig.h"
 #include "recloserAuth.h"
-
-/**
- * Structure holding the Recloser configuration 
- */
-struct recloserConfig {
-    /**
-     * Reclose attempts
-     */
-    int recloseAttempts;
-
-    /**
-     * The duration the recloser will open for on first cycle (ms)
-     */
-    int recloseOpenInterval1;
-
-    /**
-     * The duration the recloser will open for on first cycle (ms)
-     */
-    int recloseOpenInterval2;
-
-    /**
-     * The duration the recloser will open for on first cycle (ms)
-     */
-    int recloseOpenInterval3;
-
-    /**
-     * The duration the recloser will open for on first cycle (ms)
-     */
-    int recloseOpenInterval4;
-
-    /** the topics that the recloser subscribes to */
-    char *subcriptions[];
-
-}
 
 /**
  * Prompt for recloser configuration
@@ -90,6 +57,7 @@ int main() {
     //we will use a default username of 'admin' for system setup
     recloserStartup();
 
+    recloser = {0};
 
     //when tech plugs into recloser program will display
     print("Recloser is active\n");

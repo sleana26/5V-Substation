@@ -1,6 +1,6 @@
-recloseAttempts:
-recloseOpenInterval1:
-recloseOpenInterval2:
-recloseOpenInterval3:
-recloseOpenInterval4:
-subcriptions:
+recloseAttempts:2
+recloseOpenInterval1:2
+recloseOpenInterval2:2
+recloseOpenInterval3:2
+recloseOpenInterval4:2
+subcriptions:[string]

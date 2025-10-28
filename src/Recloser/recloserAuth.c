@@ -73,7 +73,6 @@ static bool compareCredentials(char *passAttempt, char *user) {
     while(line = scanLine(passfile)) {
         if(sscanf(line, "%99[^:]%n", buff, &index) == 1) {
             if(strcmp(buff, user) == 0) {
-                offset++;
                 break;
             }
         }
