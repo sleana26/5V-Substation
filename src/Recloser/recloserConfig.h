@@ -26,5 +26,8 @@ struct recloser {
     int recloseOpenInterval4;
 
     /** the topics that the recloser subscribes to */
-    char *subcriptions[];
-}
+    char **subscriptions;
+
+};
+
+typedef struct recloser Recloser;
