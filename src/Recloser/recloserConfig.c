@@ -35,6 +35,10 @@ static bool configFileExists() {
     }
 }
 
+void configPins(Recloser *r) {
+    //todo
+}
+
 /**
  * Reads the current configuration from config file into a Recloser struct
  */
@@ -146,31 +150,7 @@ void loadRecloserFromFile(Recloser *r) {
     }
 }
 
-/**
- * FUNCTION NOT FULLY IMPLEMENTED
- * Edits configuration file
- * @returns 1 if configuration was changed
- */
-// int changeConfiguration(int configNumber, Recloser *r) {
-//     if(configNumber == 1) {
-//         pritnf("Enter the number of reclosing attempts(1-4): ");
-//         int num = 0;
-//         scanf(&num, "%d");
-//         while(num < 1 && num > 4) {
-//             printf("Please try again, enter the number of reclosing attempts(1-4): ");
-//             scanf(&num, "%d");
-//         }
-//         //updates the config data in the file
-// //        updateFile(r, num);
-//         //we need a struct because its faster for the while loop
-//     } else if(configNumber == 2) {
 
-//     } else if(configNumber == 3) {
-        
-//     } else if {
-
-//     }
-// }
 
 /** 
 void updateFile(Recloser *r, int num) {
@@ -193,10 +173,80 @@ static void printExistingConfig(Recloser *r) {
     for(int i = 0; i < strlen(r->subscriptions[i]); i++) {
         for(int j = 0; j < strlen(r->subscriptions[i][j]); j++) {
             printf("%s", r->subscriptions[i][j]);
-            if(i != (strlen(r->subscriptions[i]) - 1) && (j != strlen(r->subscriptions[i][j]) - 1)) {
+            if(j != strlen(r->subscriptions[i][j]) - 1) {
                 printf(",");
             }
         }
+    }
+}
+
+/**
+ * load recloser with default settings
+ */
+void loadRecloserDefault(Recloser *r) {
+    r->recloseAttempts = 4;
+    r->recloseOpenInterval1 = 1;
+    r->recloseOpenInterval2 = 1;
+    r->recloseOpenInterval3 = 2;
+    r->recloseOpenInterval4 = 4;
+}
+
+/**
+ * FUNCTION NOT FULLY IMPLEMENTED
+ * Edits configuration file
+ * @returns 1 if configuration was changed
+ */
+int changeConfiguration(char configNumber, Recloser *r) {
+    int num = 0;
+    if(configNumber == 1) {
+        printf("Enter the number of reclosing attempts(1-4): ");
+        if(scanf("%d", &num) == 1) {
+            while(num < 1 && num > 4) {
+                printf("Please try again, enter a valid number of reclosing attempts(1-4): ");
+                scanf("%d", &num);
+            }
+            //updates the config data in the file
+            r->recloseAttempts = num;
+        }
+        //we need a struct because its faster for the while loop
+    } else if(configNumber == 2) {
+        printf("Enter recloser interval for reclose attempt 1(s): ");
+        if(scanf("%d", &num) == 1) {
+            while(num < 0 && num > 10) {
+                printf("Please try again, enter a valid interval for reclose attempt 1 (1-10s): ");
+                scanf("%d", &num);
+            }
+            r->recloseOpenInterval1 = num;
+        }
+    } else if(configNumber == 3) {
+        printf("Enter recloser interval for reclose attempt 2(s): ");
+        if(scanf("%d", &num) == 1) {
+            while(num < 0 && num > 10) {
+                printf("Please try again, enter a valid interval for reclose attempt 2 (1-10s): ");
+                scanf("%d", &num);
+            }
+            r->recloseOpenInterval2 = num;
+        }
+    } else if (configNumber == 4) {
+        printf("Enter recloser interval for reclose attempt 3(s): ");
+        if(scanf("%d", &num) == 1) {
+            while(num < 0 && num > 10) {
+                printf("Please try again, enter a valid interval for reclose attempt 3 (1-10s): ");
+                scanf("%d", &num);
+            }
+            r->recloseOpenInterval3 = num;
+        }
+    } else if (configNumber == 5) {
+        printf("Enter recloser interval for reclose attempt 4(s): ");
+        if(scanf("%d", &num) == 1) {
+            while(num < 0 && num > 10) {
+                printf("Please try again, enter a valid interval for reclose attempt 4 (1-10s): ");
+                scanf("%d", &num);
+            }
+            r->recloseOpenInterval4 = num;
+        }
+    } else if (configNumber == 6) {
+
     }
 }
 
@@ -208,21 +258,24 @@ void config(Recloser *r) {
     if(configFileExists()) {
         loadRecloserFromFile(r);
     } else {
-        loadRecloserDefault();
+        //create file
+        
+        //
+        loadRecloserDefault(r);
     }
-    configPins();
+    //todoconfigPins();
 
     // prints config 
     //or if they want to continue with existing config
-    char input;
+    int input;
     //asks user to enter number of config to change
-    while(true) {
-        printConfig(r);
+    while(input != 0) {
+        printExistingConfig(r);
         printf("Enter configuration number to change associated configuration or enter 0 to exit: ");
-        char input = getchar();
+        scanf("%d", &input);
 
-        if(input == '0') {
-            break;
+        if(input == 0) {
+            printf("Exiting\n");
         } else if(input > 0 && input <= 10) {
             if(changeConfiguration(input, r)) {
                 printf("\nConfiguration changed successfully.\n\n");                    
@@ -231,13 +284,10 @@ void config(Recloser *r) {
             printf("Invalid input\n");
         }
     }
-    configPins();
+   //todo configPins();
 }
 
-/**
- * FUNCTION NOT FULLY IMPLEMENTED
- * load recloser with default settings
 
-loadRecloserDefault(struct) {
 
-} */
+
+
