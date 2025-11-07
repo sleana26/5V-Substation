@@ -181,7 +181,7 @@ void updateFile(Recloser *r, int num) {
 /**
  * Print the existing configuration
  */
-static void printConfig(Recloser *r) {
+static void printExistingConfig(Recloser *r) {
     printf("Existing configuration:\n");
     printf("Reclose attempts: %d\n", r->recloseAttempts);
     printf("Open interval duration: \n");
@@ -192,7 +192,10 @@ static void printConfig(Recloser *r) {
     
     for(int i = 0; i < strlen(r->subscriptions[i]); i++) {
         for(int j = 0; j < strlen(r->subscriptions[i][j]); j++) {
-            printf(r->subscriptions[i][j]);
+            printf("%s", r->subscriptions[i][j]);
+            if(i != (strlen(r->subscriptions[i]) - 1) && (j != strlen(r->subscriptions[i][j]) - 1)) {
+                printf(",");
+            }
         }
     }
 }
