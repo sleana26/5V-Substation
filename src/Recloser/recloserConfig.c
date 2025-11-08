@@ -27,17 +27,18 @@ static bool configFileExists() {
     fileptr = fopen("../../env/recloserConfig.txt", "r");
     //check if file was found
     if(!fileptr) {
-        fclose("../../env/recloserConfig.txt");
         return false;
-    } else {
-        fclose("../../env/recloserConfig.txt");
-        return true;
     }
+    fclose(fileptr);
+    return true;
 }
 
-void configPins(Recloser *r) {
-    //todo
-}
+// void configPins(Recloser *r) {
+//     //todo
+// }
+
+// void writeRecloserToFile(Recloser *r) {
+//}
 
 /**
  * Reads the current configuration from config file into a Recloser struct
@@ -172,7 +173,7 @@ static void printExistingConfig(Recloser *r) {
     
     for(int i = 0; i < strlen(r->subscriptions[i]); i++) {
         for(int j = 0; j < strlen(r->subscriptions[i][j]); j++) {
-            printf("%s", r->subscriptions[i][j]);
+            printf("%c", r->subscriptions[i][j]);
             if(j != strlen(r->subscriptions[i][j]) - 1) {
                 printf(",");
             }
@@ -256,16 +257,16 @@ int changeConfiguration(char configNumber, Recloser *r) {
 void config(Recloser *r) {
     //checks if config file exists
     if(configFileExists()) {
+        //loads recloser from existing configuration file
         loadRecloserFromFile(r);
     } else {
         //create file
-        
-        //
+        fopen("../../env/recloserConfig.txt", 'w');
+        //loads recloser with default settings
         loadRecloserDefault(r);
     }
-    //todoconfigPins();
 
-    // prints config 
+    printExistingConfig(r);
     //or if they want to continue with existing config
     int input;
     //asks user to enter number of config to change
@@ -284,10 +285,5 @@ void config(Recloser *r) {
             printf("Invalid input\n");
         }
     }
-   //todo configPins();
+   //configPins();
 }
-
-
-
-
-
