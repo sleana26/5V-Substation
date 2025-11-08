@@ -193,75 +193,69 @@ void loadRecloserDefault(Recloser *r) {
 }
 
 /**
+ * Verify number
+ */
+static int retrieveNumber(const char *prompt, int min, int max, const char *retry) {
+    int num;
+    printf("%s", prompt);
+    scanf("%d", &num);
+    while(num < min || num > max) {
+        printf("%s", retry);
+        scanf("%d", &num);
+    }
+    return num;
+}
+
+/**
  * FUNCTION NOT FULLY IMPLEMENTED
  * Edits configuration file
  * @returns 1 if configuration was changed
  */
-int changeConfiguration(char configNumber, Recloser *r) {
+int changeConfiguration(int configNumber, Recloser *r) {
     int num = 0;
     if(configNumber == 1) {
-        printf("Enter the number of reclosing attempts(1-4): ");
-        if(scanf("%d", &num) == 1) {
-            while(num < 1 && num > 4) {
-                printf("Please try again, enter a valid number of reclosing attempts(1-4): ");
-                scanf("%d", &num);
-            }
-            //updates the config data in the file
-            r->recloseAttempts = num;
-        }
-        //we need a struct because its faster for the while loop
+        //updates the config data in the file
+        r->recloseAttempts = retrieveNumber("Enter the number of reclosing attempts(1-4): ", 1, 4, "Please try again, enter a valid number of reclosing attempts(1-4): ");
     } else if(configNumber == 2) {
-        printf("Enter recloser interval for reclose attempt 1(s): ");
-        if(scanf("%d", &num) == 1) {
-            while(num < 0 && num > 10) {
-                printf("Please try again, enter a valid interval for reclose attempt 1 (1-10s): ");
-                scanf("%d", &num);
-            }
-            r->recloseOpenInterval1 = num;
-        }
+        r->recloseOpenInterval1 = retrieveNumber("Enter recloser interval for reclose attempt one (1-10s): ", 1, 10, "Please try again, enter a valid interval for reclose attempt one (1-10s): ");
     } else if(configNumber == 3) {
-        printf("Enter recloser interval for reclose attempt 2(s): ");
-        if(scanf("%d", &num) == 1) {
-            while(num < 0 && num > 10) {
-                printf("Please try again, enter a valid interval for reclose attempt 2 (1-10s): ");
-                scanf("%d", &num);
-            }
-            r->recloseOpenInterval2 = num;
-        }
+        // printf("Enter recloser interval for reclose attempt 2(s): ");
+        // if(scanf("%d", &num) == 1) {
+        //     while(num < 0 && num > 10) {
+        //         printf("Please try again, enter a valid interval for reclose attempt 2 (1-10s): ");
+        //         scanf("%d", &num);
+        //     }
+        r->recloseOpenInterval2 = retrieveNumber("Enter recloser interval for reclose attempt two (1-10s): ", 1, 10, "Please try again, enter a valid interval for reclose attempt two (1-10s): ");
     } else if (configNumber == 4) {
-        printf("Enter recloser interval for reclose attempt 3(s): ");
-        if(scanf("%d", &num) == 1) {
-            while(num < 0 && num > 10) {
-                printf("Please try again, enter a valid interval for reclose attempt 3 (1-10s): ");
-                scanf("%d", &num);
-            }
-            r->recloseOpenInterval3 = num;
-        }
+        // printf("Enter recloser interval for reclose attempt 3(s): ");
+        // if(scanf("%d", &num) == 1) {
+        //     while(num < 0 && num > 10) {
+        //         printf("Please try again, enter a valid interval for reclose attempt 3 (1-10s): ");
+        //         scanf("%d", &num);
+        //     }
+         r->recloseOpenInterval3 = retrieveNumber("Enter recloser interval for reclose attempt three (1-10s): ", 1, 10, "Please try again, enter a valid interval for reclose attempt three (1-10s): ");
     } else if (configNumber == 5) {
-        printf("Enter recloser interval for reclose attempt 4(s): ");
-        if(scanf("%d", &num) == 1) {
-            while(num < 0 && num > 10) {
-                printf("Please try again, enter a valid interval for reclose attempt 4 (1-10s): ");
-                scanf("%d", &num);
-            }
-            r->recloseOpenInterval4 = num;
-        }
-    } else if (configNumber == 6) {
-
+        r->recloseOpenInterval4 = retrieveNumber("Enter recloser interval for reclose attempt four (1-10s): ", 1, 10, "Please try again, enter a valid interval for reclose attempt four (1-10s): ");
     }
+    // } else if (configNumber == 6) {
+    // }
+    else {
+        printf("finish this function\n");
+    }
+
 }
 
 /**
  * Checks if file exists, if it does it will pull 
  */
-void config(Recloser *r) {
+static void config(Recloser *r) {
     //checks if config file exists
     if(configFileExists()) {
         //loads recloser from existing configuration file
         loadRecloserFromFile(r);
     } else {
         //create file
-        fopen("../../env/recloserConfig.txt", 'w');
+        fopen("../../env/recloserConfig.txt", "w");
         //loads recloser with default settings
         loadRecloserDefault(r);
     }
